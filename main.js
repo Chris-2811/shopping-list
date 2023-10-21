@@ -25,8 +25,6 @@ function onItemSubmit(e) {
       itemToEdit.classList.remove('edit-mode');
       itemToEdit.remove();
       editMode = false;
-    } else {
-      alert('This item already exists!');
     }
   }
 
@@ -52,6 +50,7 @@ function checkForDuplicates(newItem) {
 function addToDOM(newItem) {
   const li = document.createElement('li');
   li.appendChild(document.createTextNode(newItem));
+  li.classList.add('list-item');
 
   const button = createButton();
 
@@ -76,15 +75,21 @@ function createButton() {
 function onItemClick(e) {
   if (e.target.parentElement.classList.contains('remove-item')) {
     if (confirm('Are you sure?')) {
+      if (
+        e.target.parentElement.parentElement.textContent === itemInput.value
+      ) {
+        editMode = false;
+      }
       removeItem(e.target.parentElement.parentElement);
     }
-  } else {
+  } else if (e.target.closest('li')) {
     setToEditMode(e.target);
   }
 }
 
 // Set item into edit mode
 function setToEditMode(item) {
+  editMode = true;
   const items = document.querySelectorAll('li');
   items.forEach((item) => {
     item.classList.remove('edit-mode');
@@ -94,7 +99,6 @@ function setToEditMode(item) {
   itemInput.value = item.textContent;
   btn.style.backgroundColor = 'green';
   btn.innerHTML = '<i class="fa fa-pen"></i> Update Item';
-  editMode = true;
 }
 
 // Remove item
@@ -111,6 +115,9 @@ function clearItems() {
     itemList.removeChild(itemList.firstChild);
 
     clearItemsFromLocalStorage();
+    console.log(editMode);
+    itemInput.value = '';
+    editMode = false;
     updateUI();
   }
 }
